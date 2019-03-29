@@ -96,11 +96,15 @@
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _utils = __webpack_require__(/*! ./utils */ "./src/utils.js");
 
 var _utils2 = _interopRequireDefault(_utils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var canvas = document.querySelector('canvas');
 var c = canvas.getContext('2d');
@@ -116,46 +120,58 @@ var mouse = {
 var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
 
 // Event Listeners
-addEventListener('mousemove', function (event) {
+window.addEventListener('mousemove', function (event) {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
 });
 
-addEventListener('resize', function () {
+window.addEventListener('resize', function () {
     canvas.width = innerWidth;
     canvas.height = innerHeight;
 
     init();
 });
 
-// Objects
-function Object(x, y, radius, color) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-}
+var Ball = function () {
+    function Ball(x, y, radius, color) {
+        _classCallCheck(this, Ball);
 
-Object.prototype.draw = function () {
-    c.beginPath();
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    c.fillStyle = this.color;
-    c.fill();
-    c.closePath();
-};
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+    }
 
-Object.prototype.update = function () {
-    this.draw();
-};
+    _createClass(Ball, [{
+        key: 'draw',
+        value: function draw() {
+            c.beginPath();
+            c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            c.fillStyle = this.color;
+            c.fill();
+            c.closePath();
+        }
+    }, {
+        key: 'update',
+        value: function update() {
+            this.draw();
+        }
+    }]);
+
+    return Ball;
+}();
 
 // Implementation
-var objects = void 0;
-function init() {
-    objects = [];
 
-    for (var i = 0; i < 400; i++) {
-        // objects.push();
-    }
+
+var ball = void 0;
+function init() {
+
+    ball = new Ball(canvas.width / 2, canvas.height / 2, 30, 'black');
+
+    // for (let i = 0; i < 400; i++) {
+    //     Balls.push()
+    // }
 }
 
 // Animation Loop
@@ -163,10 +179,7 @@ function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0, 0, canvas.width, canvas.height);
 
-    c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y);
-    // objects.forEach(object => {
-    //  object.update();
-    // });
+    ball.update();
 }
 
 init();
