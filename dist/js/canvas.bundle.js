@@ -119,13 +119,34 @@ var mouse = {
 
 var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
 
+var gravity = 0.2;
+var friction = 0.6;
+
+// values
+var ballCount = 200;
+
+var ballInput = document.getElementById("ballCount");
+var ballnumber = document.querySelector('.ballnumber');
+ballnumber.innerHTML = 'Ball Count: ' + ballCount;
+
+ballInput.addEventListener('mousemove', function (event) {
+    ballCount = event.target.valueAsNumber;
+
+    ballnumber.innerHTML = 'Ball Count: ' + ballCount;
+});
+
 // Event Listeners
+window.addEventListener('click', function () {
+    init();
+});
+
 window.addEventListener('mousemove', function (event) {
     mouse.x = event.clientX;
     mouse.y = event.clientY;
 });
 
 window.addEventListener('resize', function () {
+
     canvas.width = innerWidth;
     canvas.height = innerHeight;
 
@@ -133,11 +154,13 @@ window.addEventListener('resize', function () {
 });
 
 var Ball = function () {
-    function Ball(x, y, radius, color) {
+    function Ball(x, y, dx, dy, radius, color) {
         _classCallCheck(this, Ball);
 
         this.x = x;
         this.y = y;
+        this.dx = dx;
+        this.dy = dy;
         this.radius = radius;
         this.color = color;
     }
@@ -154,6 +177,19 @@ var Ball = function () {
     }, {
         key: 'update',
         value: function update() {
+            if (this.y + this.radius + this.dy > canvas.height) {
+                this.dy = -this.dy * friction;
+            } else {
+                this.dy += gravity;
+            }
+
+            if (this.x + this.radius + this.dx > canvas.width || this.x - this.radius <= 0) {
+                this.dx = -this.dx;
+            }
+
+            this.x += this.dx;
+
+            this.y += this.dy;
             this.draw();
         }
     }]);
@@ -165,13 +201,24 @@ var Ball = function () {
 
 
 var ball = void 0;
+var ballArray = [];
+
 function init() {
+    ballArray = [];
 
-    ball = new Ball(canvas.width / 2, canvas.height / 2, 30, 'black');
+    for (var i = 0; i < ballCount; i++) {
+        var radius = _utils2.default.randomIntFromRange(8, 20);
 
-    // for (let i = 0; i < 400; i++) {
-    //     Balls.push()
-    // }
+        var x = _utils2.default.randomIntFromRange(radius, canvas.width - radius);
+        var y = _utils2.default.randomIntFromRange(radius, canvas.height - radius);
+
+        var dx = _utils2.default.randomIntFromRange(-2, 2);
+        var dy = _utils2.default.randomIntFromRange(-2, 2);
+
+        ball = new Ball(x, y, dx, dy, radius, _utils2.default.randomColor(colors));
+
+        ballArray.push(ball);
+    }
 }
 
 // Animation Loop
@@ -179,7 +226,9 @@ function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0, 0, canvas.width, canvas.height);
 
-    ball.update();
+    ballArray.forEach(function (ball) {
+        ball.update();
+    });
 }
 
 init();
